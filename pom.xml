@@ -20,6 +20,7 @@
 
     <modules>
         <module>service-common</module>
+        <module>service-venue</module>
         <module>service-favorite</module>
     </modules>
 
@@ -221,6 +222,14 @@
                                         <contextPath>/favorites</contextPath>
                                         <groupId>${project.groupId}.service</groupId>
                                         <artifactId>favorites</artifactId>
+                                        <version>${project.version}</version>
+                                        <type>war</type>
+                                        <asWebapp>true</asWebapp>
+                                    </webapp>
+                                    <webapp>
+                                        <contextPath>/venues</contextPath>
+                                        <groupId>${project.groupId}.service</groupId>
+                                        <artifactId>venues</artifactId>
                                         <version>${project.version}</version>
                                         <type>war</type>
                                         <asWebapp>true</asWebapp>
