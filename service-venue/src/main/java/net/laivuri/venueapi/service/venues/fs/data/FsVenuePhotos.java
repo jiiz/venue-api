@@ -21,44 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.laivuri.venueapi.service.favorites;
+package net.laivuri.venueapi.service.venues.fs.data;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import org.springframework.beans.BeanUtils;
 
 /**
  *
  * @author Juhani Laitakari
+ *
+ * Partial response model for FourSquare venue photo request {@link https://developer.foursquare.com/docs/venues/photos}
  */
-public final class TestData {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FsVenuePhotos {
 
-    private static final String TEST_DATA_FILE = "/testdata-favorites.json";
+    private int count;
+    private List<FsPhoto> items;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private TestData() {
+    public FsVenuePhotos() {
+        this.items = new ArrayList<>();
     }
 
-    private static List<FavoriteVenue> readTestData() throws IOException {
-        try (InputStream is = TestData.class.getResourceAsStream(TEST_DATA_FILE)) {
-            return MAPPER.readValue(is, new TypeReference<List<FavoriteVenue>>() {
-            });
-        }
+    public int getCount() {
+        return count;
     }
 
-    public static List<FavoriteVenue> getFreshTestData() throws IOException {
-        List<FavoriteVenue> copiedData = new ArrayList<>();
-        for (FavoriteVenue source : readTestData()) {
-            FavoriteVenue copy = new FavoriteVenue();
-            BeanUtils.copyProperties(source, copy);
-            copiedData.add(copy);
-        }
-        return copiedData;
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public List<FsPhoto> getItems() {
+        return items;
+    }
+
+    public void setItems(List<FsPhoto> items) {
+        this.items = items;
     }
 }

@@ -17,6 +17,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <foursquare.host>https://api.foursquare.com</foursquare.host>
+        <!-- FourSquare client credentials parameters that need to be assigned -->
+        <foursquare.client_id></foursquare.client_id>
+        <foursquare.client_secret></foursquare.client_secret>
     </properties>
 
     <dependencies>
@@ -41,8 +46,22 @@
             <artifactId>unitils-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.restassured</groupId>
             <artifactId>rest-assured</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xebialabs.restito</groupId>
+            <artifactId>restito</artifactId>
+            <version>0.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -102,5 +121,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <foursquare.host>http://localhost:8081</foursquare.host>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

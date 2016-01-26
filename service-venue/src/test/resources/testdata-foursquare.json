@@ -1,0 +1,76 @@
+{
+  "venueResponse": {
+    "meta": {
+      "code": 200,
+      "requestId": "56a86b5a498ebe014f186057"
+    },
+    "response": {
+      "venue": {
+        "id": "45ac12d6f964a5205d411fe3",
+        "name": "Blue Ribbon Sushi",
+        "contact": {
+          "phone": "2123430404"
+        },
+        "location": {
+          "address": "119 Sullivan St"
+        },
+        "stats": {
+          "checkinsCount": 12265,
+          "usersCount": 8239,
+          "tipCount": 219
+          ,
+          "visitsCount": 13051
+        },
+        "url": "http://www.blueribbonrestaurants.com"
+      }
+    }
+  },
+  "venueSearchResponse": {
+    "meta": {
+      "code": 200,
+      "requestId": "56a86b5a498ebe014f186057"
+    },
+    "response": {
+      "venues": [
+        {
+          "id": "45ac12d6f964a5205d411fe3",
+          "name": "Blue Ribbon Sushi",
+          "contact": {
+            "phone": "2123430404"
+          },
+          "location": {
+            "address": "119 Sullivan St"
+          },
+          "stats": {
+            "checkinsCount": 12265,
+            "usersCount": 8239,
+            "tipCount": 219,
+            "visitsCount": 13051
+          },
+          "url": "http://www.blueribbonrestaurants.com"
+        }
+      ]
+    }
+  },
+  "photosResponse": {
+    "meta": {
+      "code": 200,
+      "requestId": "56a86cb4498e4db563a034c4"
+    },
+    "response": {
+      "photos": {
+        "count": 2,
+        "items": [
+          {
+            "prefix": "https://photos.org/",
+            "suffix": "/test-photo-1.jpg"
+          },
+          {
+            "prefix": "https://photos.org/",
+            "suffix": "/test-photo-2.jpg"
+          }
+        ]
+      }
+    }
+  }
+}

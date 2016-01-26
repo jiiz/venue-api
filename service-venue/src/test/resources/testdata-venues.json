@@ -1,0 +1,22 @@
+{
+  "venues": [
+    {
+      "id": "45ac12d6f964a5205d411fe3",
+      "name": "Blue Ribbon Sushi",
+      "address": "119 Sullivan St",
+      "url": "http://www.blueribbonrestaurants.com",
+      "phone": "2123430404"
+    }
+  ],
+  "venuePhotos": [
+    "https://photos.org/original/test-photo-1.jpg",
+    "https://photos.org/original/test-photo-2.jpg"
+  ],
+  "venueSummary": {
+    "checkinsCount": 12265,
+    "usersCount": 8239,
+    "tipCount": 219,
+    "visitsCount": 13051,
+    "photosCount": 2
+  }
+}

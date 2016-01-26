@@ -33,7 +33,12 @@ THE SOFTWARE.
     <context:annotation-config />
     <context:component-scan base-package="net.laivuri.venueapi.service" />
 
-    <!--    <bean id="favoriteStore" class="net.laivuri.venueapi.service.favorites.store.impl.JsonFavoriteVenueStore">
-        <constructor-arg value=".storage-favorites.json"/>
-    </bean>-->
+    <bean id="fsClient" class="net.laivuri.venueapi.service.venues.fs.FourSquareClientImpl">
+        <constructor-arg value="${foursquare.host}" index="0"/>
+        <constructor-arg value="${foursquare.client_id}" index="1"/>
+        <constructor-arg value="${foursquare.client_secret}" index="2"/>
+    </bean>
+    <bean id="venueDao" class="net.laivuri.venueapi.service.venues.dao.impl.FourSquareVenueDao">
+        <constructor-arg ref="fsClient"/>
+    </bean>
 </beans>

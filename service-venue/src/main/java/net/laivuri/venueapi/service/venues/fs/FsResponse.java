@@ -21,44 +21,61 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.laivuri.venueapi.service.favorites;
+package net.laivuri.venueapi.service.venues.fs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import org.springframework.beans.BeanUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  *
  * @author Juhani Laitakari
+ * @param <T>
  */
-public final class TestData {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FsResponse<T> {
 
-    private static final String TEST_DATA_FILE = "/testdata-favorites.json";
+    private FsResponseMeta meta;
+    private T response;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private TestData() {
+    public FsResponse() {
+        this.meta = new FsResponseMeta();
     }
 
-    private static List<FavoriteVenue> readTestData() throws IOException {
-        try (InputStream is = TestData.class.getResourceAsStream(TEST_DATA_FILE)) {
-            return MAPPER.readValue(is, new TypeReference<List<FavoriteVenue>>() {
-            });
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class FsResponseMeta {
+
+        private String code;
+        private String requestId;
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getRequestId() {
+            return requestId;
+        }
+
+        public void setRequestId(String requestId) {
+            this.requestId = requestId;
         }
     }
 
-    public static List<FavoriteVenue> getFreshTestData() throws IOException {
-        List<FavoriteVenue> copiedData = new ArrayList<>();
-        for (FavoriteVenue source : readTestData()) {
-            FavoriteVenue copy = new FavoriteVenue();
-            BeanUtils.copyProperties(source, copy);
-            copiedData.add(copy);
-        }
-        return copiedData;
+    public FsResponseMeta getMeta() {
+        return meta;
+    }
+
+    public void setMeta(FsResponseMeta meta) {
+        this.meta = meta;
+    }
+
+    public T getResponse() {
+        return response;
+    }
+
+    public void setResponse(T response) {
+        this.response = response;
     }
 }

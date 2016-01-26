@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Juhani Laitakari
  */
-public class AbstractVenueApiTest {
+public abstract class AbstractVenueApiTest {
 
     private static final Logger LOG = Logger.getLogger(AbstractVenueApiTest.class.getName());
 

@@ -21,44 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.laivuri.venueapi.service.favorites;
+package net.laivuri.venueapi.service.venues.fs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import org.springframework.beans.BeanUtils;
+import net.laivuri.venueapi.service.venues.fs.data.FsVenue;
 
 /**
  *
  * @author Juhani Laitakari
  */
-public final class TestData {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class FsResponseVenueSearch {
 
-    private static final String TEST_DATA_FILE = "/testdata-favorites.json";
+    private List<FsVenue> venues;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private TestData() {
+    public List<FsVenue> getVenues() {
+        return venues;
     }
 
-    private static List<FavoriteVenue> readTestData() throws IOException {
-        try (InputStream is = TestData.class.getResourceAsStream(TEST_DATA_FILE)) {
-            return MAPPER.readValue(is, new TypeReference<List<FavoriteVenue>>() {
-            });
-        }
+    public void setVenues(List<FsVenue> venues) {
+        this.venues = venues;
     }
 
-    public static List<FavoriteVenue> getFreshTestData() throws IOException {
-        List<FavoriteVenue> copiedData = new ArrayList<>();
-        for (FavoriteVenue source : readTestData()) {
-            FavoriteVenue copy = new FavoriteVenue();
-            BeanUtils.copyProperties(source, copy);
-            copiedData.add(copy);
-        }
-        return copiedData;
-    }
 }

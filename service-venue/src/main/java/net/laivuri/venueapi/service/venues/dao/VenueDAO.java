@@ -21,44 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.laivuri.venueapi.service.favorites;
+package net.laivuri.venueapi.service.venues.dao;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import org.springframework.beans.BeanUtils;
+import net.laivuri.venueapi.service.common.exp.EntityNotFoundException;
+import net.laivuri.venueapi.service.common.exp.EntityStorageException;
+import net.laivuri.venueapi.service.venues.dto.Venue;
+import net.laivuri.venueapi.service.venues.dto.VenueSummary;
 
 /**
  *
  * @author Juhani Laitakari
+ *
+ * Interface for venue data access object implementations
  */
-public final class TestData {
+public interface VenueDAO {
 
-    private static final String TEST_DATA_FILE = "/testdata-favorites.json";
+    public List<Venue> searchVenues(String locName, String locCoords, String query) throws EntityStorageException;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    public List<String> getVenuePhotos(String venueId) throws EntityNotFoundException, EntityStorageException;
 
-    private TestData() {
-    }
+    public VenueSummary getVenueSummary(String venueId) throws EntityNotFoundException, EntityStorageException;
 
-    private static List<FavoriteVenue> readTestData() throws IOException {
-        try (InputStream is = TestData.class.getResourceAsStream(TEST_DATA_FILE)) {
-            return MAPPER.readValue(is, new TypeReference<List<FavoriteVenue>>() {
-            });
-        }
-    }
-
-    public static List<FavoriteVenue> getFreshTestData() throws IOException {
-        List<FavoriteVenue> copiedData = new ArrayList<>();
-        for (FavoriteVenue source : readTestData()) {
-            FavoriteVenue copy = new FavoriteVenue();
-            BeanUtils.copyProperties(source, copy);
-            copiedData.add(copy);
-        }
-        return copiedData;
-    }
 }

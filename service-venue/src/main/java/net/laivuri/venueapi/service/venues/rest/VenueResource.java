@@ -21,44 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.laivuri.venueapi.service.favorites;
+package net.laivuri.venueapi.service.venues.rest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import org.springframework.beans.BeanUtils;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import net.laivuri.venueapi.service.common.exp.EntityNotFoundException;
+import net.laivuri.venueapi.service.common.exp.EntityStorageException;
+import net.laivuri.venueapi.service.venues.dao.VenueDAO;
+import net.laivuri.venueapi.service.venues.dto.VenueSummary;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Juhani Laitakari
  */
-public final class TestData {
+public class VenueResource {
 
-    private static final String TEST_DATA_FILE = "/testdata-favorites.json";
+    private String venueId;
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    @Autowired
+    private VenueDAO dao;
 
-    private TestData() {
+    public void setId(String venueId) {
+        this.venueId = venueId;
     }
 
-    private static List<FavoriteVenue> readTestData() throws IOException {
-        try (InputStream is = TestData.class.getResourceAsStream(TEST_DATA_FILE)) {
-            return MAPPER.readValue(is, new TypeReference<List<FavoriteVenue>>() {
-            });
-        }
+    @GET
+    @Path("photos")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> getVenuePhotos() throws EntityNotFoundException, EntityStorageException {
+        return dao.getVenuePhotos(venueId);
     }
 
-    public static List<FavoriteVenue> getFreshTestData() throws IOException {
-        List<FavoriteVenue> copiedData = new ArrayList<>();
-        for (FavoriteVenue source : readTestData()) {
-            FavoriteVenue copy = new FavoriteVenue();
-            BeanUtils.copyProperties(source, copy);
-            copiedData.add(copy);
-        }
-        return copiedData;
+    @GET
+    @Path("summary")
+    @Produces(MediaType.APPLICATION_JSON)
+    public VenueSummary getVenueSummary() throws EntityNotFoundException, EntityStorageException {
+        return dao.getVenueSummary(venueId);
     }
 }
