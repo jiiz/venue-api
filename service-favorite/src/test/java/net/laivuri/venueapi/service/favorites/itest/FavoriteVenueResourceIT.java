@@ -24,15 +24,16 @@
 package net.laivuri.venueapi.service.favorites.itest;
 
 import static com.jayway.restassured.RestAssured.*;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
+import static net.laivuri.venueapi.service.common.itest.AbstractVenueApiTest.testUserName;
+import static net.laivuri.venueapi.service.common.itest.AbstractVenueApiTest.testUserPwd;
 import net.laivuri.venueapi.service.favorites.TestData;
 import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenueData;
+import static net.laivuri.venueapi.service.favorites.itest.AbstractFavoriteVenueApiTest.CSRF_HEADER;
 import org.junit.Test;
-import org.springframework.beans.BeanUtils;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDER;
 
@@ -44,30 +45,13 @@ import static org.unitils.reflectionassert.ReflectionComparatorMode.LENIENT_ORDE
  */
 public class FavoriteVenueResourceIT extends AbstractFavoriteVenueApiTest {
 
-    private void testUpdateWithInvalidData(FavoriteVenue original, FavoriteVenueData invalidData) throws IOException {
-        expect().
-            statusCode(400).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(invalidData).
-            put(original.getId());
-
-        // check that nothing was updated
-        FavoriteVenue result
-            = get(original.getId()).
-            as(FavoriteVenue.class);
-        assertReflectionEquals(original, result, LENIENT_ORDER);
-    }
-
     @Test
     public void testGet_Error_NotFound() throws Exception {
 
         expect().
-            statusCode(404).
-            when().
-            get(UUID.randomUUID().toString());
+                statusCode(404).
+                when().
+                get(UUID.randomUUID().toString());
     }
 
     @Test
@@ -75,104 +59,150 @@ public class FavoriteVenueResourceIT extends AbstractFavoriteVenueApiTest {
 
         FavoriteVenue expected = TestData.getFreshTestData().get(0);
         FavoriteVenue result = expect().
-            statusCode(200).
-            get(expected.getId()).
-            as(FavoriteVenue.class);
+                statusCode(200).
+                get(expected.getId()).
+                as(FavoriteVenue.class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
     @Test
-    public void testUpdate_Error_InvalidData() throws Exception {
+    public void testUpdateKeywords_Error_NoAuth() throws Exception {
 
         FavoriteVenue expResult = TestData.getFreshTestData().get(0);
-        FavoriteVenueData updateData = new FavoriteVenueData();
 
-        // invalid name
-        BeanUtils.copyProperties(expResult, updateData);
-        updateData.setName(" ");
-        testUpdateWithInvalidData(expResult, updateData);
-
-        // malformed url
-        BeanUtils.copyProperties(expResult, updateData);
-        updateData.setUrl("not-a-url");
-        testUpdateWithInvalidData(expResult, updateData);
-    }
-
-    @Test
-    public void testUpdate_Error_NoCSRFHeader() throws Exception {
-
-        FavoriteVenue expResult = TestData.getFreshTestData().get(0);
-        FavoriteVenueData updateData = new FavoriteVenueData();
-        BeanUtils.copyProperties(expResult, updateData);
-        updateData.setName("newname");
+        List<String> updateData = new ArrayList<>();
+        updateData.add("newkeyword");
 
         expect().
-            statusCode(400).
-            when().
-            given().
-            contentType(MediaType.APPLICATION_JSON).
-            body(updateData).
-            put(expResult.getId());
+                statusCode(401).
+                when().
+                given().
+                header(CSRF_HEADER).
+                contentType(MediaType.APPLICATION_JSON).
+                body(updateData).
+                put(expResult.getId() + "/keywords");
 
         // check that nothing was updated
         FavoriteVenue result
-            = get(expResult.getId()).
-            as(FavoriteVenue.class);
+                = get(expResult.getId()).
+                as(FavoriteVenue.class);
         assertReflectionEquals(expResult, result, LENIENT_ORDER);
     }
 
     @Test
-    public void testUpdate_Error_NotFound() throws Exception {
+    public void testUpdateKeywords_Error_NoCSRFHeader() throws Exception {
 
         FavoriteVenue expResult = TestData.getFreshTestData().get(0);
-        FavoriteVenueData updateData = new FavoriteVenueData();
-        BeanUtils.copyProperties(expResult, updateData);
-        updateData.setName("newname");
+
+        List<String> updateData = new ArrayList<>();
+        updateData.add("newkeyword");
 
         expect().
-            statusCode(404).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(updateData).
-            put(UUID.randomUUID().toString());
+                statusCode(400).
+                when().
+                given().
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(updateData).
+                put(expResult.getId() + "/keywords");
 
         // check that nothing was updated
         FavoriteVenue result
-            = get(expResult.getId()).
-            as(FavoriteVenue.class);
+                = get(expResult.getId()).
+                as(FavoriteVenue.class);
         assertReflectionEquals(expResult, result, LENIENT_ORDER);
     }
 
     @Test
-    public void testUpdate_Success() throws Exception {
+    public void testUpdateKeywords_Error_InvalidData() throws Exception {
+
+        FavoriteVenue expResult = TestData.getFreshTestData().get(0);
+
+        List<String> invalidData = new ArrayList<>();
+        invalidData.add(" ");
+        invalidData.add("");
+
+        expect().
+                statusCode(400).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(invalidData).
+                put(expResult.getId() + "/keywords");
+    }
+
+    @Test
+    public void testUpdateKeywords_Error_NotFound() throws Exception {
+
+        FavoriteVenue expResult = TestData.getFreshTestData().get(0);
+
+        List<String> updateData = new ArrayList<>();
+        updateData.add("newkeyword");
+
+        expect().
+                statusCode(404).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(updateData).
+                put(UUID.randomUUID().toString() + "/keywords");
+
+        // check that nothing was updated
+        FavoriteVenue result
+                = get(expResult.getId()).
+                as(FavoriteVenue.class);
+        assertReflectionEquals(expResult, result, LENIENT_ORDER);
+    }
+
+    @Test
+    public void testUpdateKeywords_Success() throws Exception {
 
         FavoriteVenue expected = TestData.getFreshTestData().get(0);
-        expected.setName(UUID.randomUUID().toString());
-        expected.getKeywords().remove(0);
-        expected.getKeywords().add("newkeyword");
-        FavoriteVenue updateData = new FavoriteVenue();
-        BeanUtils.copyProperties(expected, updateData);
 
-        // change id of the update data to check that id cannot be updated
-        // and request does not fail with not intended parameters
-        updateData.setId(UUID.randomUUID().toString());
+        List<String> updateData = new ArrayList<>();
+        updateData.add("newkeyword");
+
+        expected.setKeywords(updateData);
 
         expect().
-            statusCode(200).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(updateData).
-            put(expected.getId());
+                statusCode(200).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(updateData).
+                put(expected.getId() + "/keywords");
 
         // check that data was updated correctly
         FavoriteVenue result
-            = get(expected.getId()).
-            as(FavoriteVenue.class);
+                = get(expected.getId()).
+                as(FavoriteVenue.class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
+    }
+
+    @Test
+    public void testDelete_Error_NoAuth() throws Exception {
+
+        List<FavoriteVenue> expected = TestData.getFreshTestData();
+        FavoriteVenue deleted = expected.get(0);
+
+        expect().
+                statusCode(401).
+                when().
+                given().
+                header(CSRF_HEADER).
+                delete(deleted.getId());
+
+        // check that nothing was deleted
+        FavoriteVenue[] result
+                = get("").
+                as(FavoriteVenue[].class);
+        assertReflectionEquals(expected, result, LENIENT_ORDER);;
     }
 
     @Test
@@ -182,14 +212,16 @@ public class FavoriteVenueResourceIT extends AbstractFavoriteVenueApiTest {
         FavoriteVenue deleted = expected.get(0);
 
         expect().
-            statusCode(400).
-            when().
-            delete(deleted.getId());
+                statusCode(400).
+                when().
+                given().
+                auth().preemptive().basic(testUserName, testUserPwd).
+                delete(deleted.getId());
 
         // check that nothing was deleted
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);;
     }
 
@@ -197,17 +229,18 @@ public class FavoriteVenueResourceIT extends AbstractFavoriteVenueApiTest {
     public void testDelete_Error_NotFound() throws Exception {
 
         expect().
-            statusCode(404).
-            when().
-            given().
-            header(CSRF_HEADER).
-            delete(UUID.randomUUID().toString());
+                statusCode(404).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                delete(UUID.randomUUID().toString());
 
         // check that nothing was deleted
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -218,16 +251,17 @@ public class FavoriteVenueResourceIT extends AbstractFavoriteVenueApiTest {
         FavoriteVenue deleted = expected.remove(0);
 
         expect().
-            statusCode(200).
-            when().
-            given().
-            header(CSRF_HEADER).
-            delete(deleted.getId());
+                statusCode(200).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                delete(deleted.getId());
 
         // check that data was deleted
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 

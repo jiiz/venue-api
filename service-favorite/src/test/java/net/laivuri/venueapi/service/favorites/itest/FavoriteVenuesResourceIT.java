@@ -45,19 +45,20 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
 
     private void testCreateWithInvalidData(FavoriteVenue invalidData) throws IOException {
         expect().
-            statusCode(400).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(invalidData).
-            post("");
+                statusCode(400).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(invalidData).
+                post("");
 
         // check that nothing was added
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -66,10 +67,32 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
 
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         FavoriteVenue[] result = expect().
-            statusCode(200).
-            when().
-            get("").
-            as(FavoriteVenue[].class);
+                statusCode(200).
+                when().
+                get("").
+                as(FavoriteVenue[].class);
+        assertReflectionEquals(expected, result, LENIENT_ORDER);
+    }
+
+    @Test
+    public void testCreate_Error_NoAuth() throws Exception {
+
+        FavoriteVenue storedItem = TestData.getFreshTestData().get(0);
+        storedItem.setId(UUID.randomUUID().toString());
+        expect().
+                statusCode(401).
+                when().
+                given().
+                header(CSRF_HEADER).
+                contentType(MediaType.APPLICATION_JSON).
+                body(storedItem).
+                post("");
+
+        // check that nothing was added
+        List<FavoriteVenue> expected = TestData.getFreshTestData();
+        FavoriteVenue[] result
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -79,18 +102,19 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
         FavoriteVenue storedItem = TestData.getFreshTestData().get(0);
         storedItem.setId(UUID.randomUUID().toString());
         expect().
-            statusCode(400).
-            when().
-            given().
-            contentType(MediaType.APPLICATION_JSON).
-            body(storedItem).
-            post("");
+                statusCode(400).
+                when().
+                given().
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(storedItem).
+                post("");
 
         // check that nothing was added
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -99,18 +123,19 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
 
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         expect().
-            statusCode(409).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(expected.get(0)).
-            post("");
+                statusCode(409).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(expected.get(0)).
+                post("");
 
         // check that nothing was added
         FavoriteVenue[] result
-            = get("").
-            as(FavoriteVenue[].class);
+                = get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -139,22 +164,42 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
         FavoriteVenue storedItem = TestData.getFreshTestData().get(0);
         storedItem.setId(UUID.randomUUID().toString());
         expect().
-            statusCode(201).
-            when().
-            given().
-            header(CSRF_HEADER).
-            contentType(MediaType.APPLICATION_JSON).
-            body(storedItem).
-            post("");
+                statusCode(201).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                contentType(MediaType.APPLICATION_JSON).
+                body(storedItem).
+                post("");
 
         // check that stored data is found
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         expected.add(storedItem);
         FavoriteVenue[] result = expect().
-            statusCode(200).
-            when().
-            get("").
-            as(FavoriteVenue[].class);
+                statusCode(200).
+                when().
+                get("").
+                as(FavoriteVenue[].class);
+        assertReflectionEquals(expected, result, LENIENT_ORDER);
+    }
+
+    @Test
+    public void testDeleteAll_Error_NoAuth() throws Exception {
+
+        expect().
+                statusCode(401).
+                when().
+                given().
+                header(CSRF_HEADER).
+                delete("");
+
+        List<FavoriteVenue> expected = TestData.getFreshTestData();
+        // check that nothing was deleted
+        FavoriteVenue[] result = expect().
+                when().
+                get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -162,16 +207,18 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
     public void testDeleteAll_Error_NoCSRFHeader() throws Exception {
 
         expect().
-            statusCode(400).
-            when().
-            delete("");
+                statusCode(400).
+                when().
+                given().
+                auth().preemptive().basic(testUserName, testUserPwd).
+                delete("");
 
         List<FavoriteVenue> expected = TestData.getFreshTestData();
         // check that nothing was deleted
         FavoriteVenue[] result = expect().
-            when().
-            get("").
-            as(FavoriteVenue[].class);
+                when().
+                get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 
@@ -179,18 +226,19 @@ public class FavoriteVenuesResourceIT extends AbstractFavoriteVenueApiTest {
     public void testDeleteAll_Success() throws Exception {
 
         expect().
-            statusCode(200).
-            when().
-            given().
-            header(CSRF_HEADER).
-            delete("");
+                statusCode(200).
+                when().
+                given().
+                header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
+                delete("");
 
         List<FavoriteVenue> expected = new ArrayList<>();
         // check that all data was deleted
         FavoriteVenue[] result = expect().
-            when().
-            get("").
-            as(FavoriteVenue[].class);
+                when().
+                get("").
+                as(FavoriteVenue[].class);
         assertReflectionEquals(expected, result, LENIENT_ORDER);
     }
 

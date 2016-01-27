@@ -60,12 +60,14 @@ public abstract class AbstractFavoriteVenueApiTest extends AbstractVenueApiTest 
         // clear all
         given().
             header(CSRF_HEADER).
+            auth().preemptive().basic(testUserName, testUserPwd).
             delete("");
 
         // add test data
         for (FavoriteVenue venue : data) {
             given().
                 header(CSRF_HEADER).
+                auth().preemptive().basic(testUserName, testUserPwd).
                 contentType(MediaType.APPLICATION_JSON).
                 body(venue).
                 post("");

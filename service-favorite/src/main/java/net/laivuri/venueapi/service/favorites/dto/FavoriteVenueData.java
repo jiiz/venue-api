@@ -31,7 +31,7 @@ import org.hibernate.validator.constraints.URL;
 
 /**
  *
- * @author Juhani Laitakari 
+ * @author Juhani Laitakari
  *
  * Favorite venue data
  */

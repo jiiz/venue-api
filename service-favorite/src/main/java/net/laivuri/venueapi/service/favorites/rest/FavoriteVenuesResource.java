@@ -24,6 +24,7 @@
 package net.laivuri.venueapi.service.favorites.rest;
 
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -36,6 +37,7 @@ import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import net.laivuri.venueapi.service.common.dto.DTOValidator;
 import net.laivuri.venueapi.service.common.exp.EntityAlreadyExistsException;
@@ -50,7 +52,7 @@ import net.laivuri.venueapi.service.common.exp.EntityNotFoundException;
 
 /**
  *
- * @author Juhani Laitakari 
+ * @author Juhani Laitakari
  */
 @Path("/")
 public class FavoriteVenuesResource {
@@ -64,6 +66,8 @@ public class FavoriteVenuesResource {
     private UriInfo uriInfo;
     @Context
     private ResourceContext rc;
+    @Context
+    private SecurityContext sc;
 
     @Path("{id}")
     public FavoriteVenueResource getSubResource(@PathParam("id") String id) {
@@ -80,8 +84,9 @@ public class FavoriteVenuesResource {
     }
 
     @POST
-    @SuccessfulStatus(status = Response.Status.CREATED)
+    @RolesAllowed("user")
     @Consumes(MediaType.APPLICATION_JSON)
+    @SuccessfulStatus(status = Response.Status.CREATED)
     public void create(FavoriteVenue favorite) throws
         EntityInvalidDataException,
         EntityAlreadyExistsException,
@@ -94,6 +99,7 @@ public class FavoriteVenuesResource {
     }
 
     @DELETE
+    @RolesAllowed("user")
     @SuccessfulStatus(status = Response.Status.OK)
     public void deleteAll() throws EntityNotFoundException, EntityStorageException {
         favoriteStore.deleteAll();

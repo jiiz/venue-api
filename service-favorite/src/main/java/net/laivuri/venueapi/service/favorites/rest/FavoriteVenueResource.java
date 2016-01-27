@@ -23,26 +23,28 @@
  */
 package net.laivuri.venueapi.service.favorites.rest;
 
+import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import net.laivuri.venueapi.service.common.dto.DTOValidator;
 import net.laivuri.venueapi.service.common.exp.EntityInvalidDataException;
 import net.laivuri.venueapi.service.common.exp.EntityNotFoundException;
 import net.laivuri.venueapi.service.common.exp.EntityStorageException;
 import net.laivuri.venueapi.service.favorites.dto.FavoriteVenue;
-import net.laivuri.venueapi.service.favorites.dto.FavoriteVenueData;
 import net.laivuri.venueapi.service.favorites.store.FavoriteVenueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import net.laivuri.venueapi.service.common.annotation.SuccessfulStatus;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
- * @author Juhani Laitakari 
+ * @author Juhani Laitakari
  *
  * Favorite venue subresource
  */
@@ -64,19 +66,28 @@ public class FavoriteVenueResource {
     }
 
     @PUT
+    @Path("keywords")
     @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed("user")
     @SuccessfulStatus(status = Response.Status.OK)
-    public void update(FavoriteVenueData newVenueData) throws
+    public void updateKeywords(List<String> keywords) throws
             EntityInvalidDataException,
             EntityNotFoundException,
             EntityStorageException {
 
-        DTOValidator<FavoriteVenueData> validator = new DTOValidator<>();
-        validator.checkValidity(newVenueData);
-        favoriteStore.update(id, newVenueData);
+        for (String keyword : keywords) {
+            if (StringUtils.isBlank(keyword)) {
+                throw new EntityInvalidDataException("Keyword cannot be blank");
+            }
+        }
+        FavoriteVenue fav = favoriteStore.get(id);
+        fav.setKeywords(keywords);
+
+        favoriteStore.update(id, fav);
     }
 
     @DELETE
+    @RolesAllowed("user")
     @SuccessfulStatus(status = Response.Status.OK)
     public void delete() throws EntityNotFoundException, EntityStorageException {
         favoriteStore.delete(id);
