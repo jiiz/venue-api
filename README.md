@@ -1,3 +1,4 @@
+![CI status](https://api.travis-ci.org/jiiz/venue-api.svg?branch=master)
 # Venue API
 
 Venue API is a Java based standalone service that provides a REST API for
@@ -39,16 +40,16 @@ from command line, see details below.
 </profile>
 ```
 
-Issue either one of the following commands in the project folder:
+Issue one of the commands below in the project folder depending on how you'd like to supply the credentials.
 
 _Credentials in settings.xml_
 ```
-mvn clean install && tomcat7:run
+mvn clean install && mvn tomcat7:run
 ```
 
 _Credentials from command line_
 ```
-mvn clean install -Dfoursquare.client_id=[ID] -Dfoursquare.client_secret=[SECRET] && tomcat7:run
+mvn clean install -Dfoursquare.client_id=[ID] -Dfoursquare.client_secret=[SECRET] && mvn tomcat7:run
 ```
 
 This will first install the project to your local maven repository and then deploy the built service WARs to a Tomcat 7 container.
@@ -72,15 +73,17 @@ Adding and modifying favorite venues requires HTTP Basic authentication,
 and a CSRF protection header `X-Requested-By` with arbitrary value in the request.
 Without the CSRF header HTTP 400 - Bad Request is returned.
 
-Default username and password are `apiuser` / `password`
+Default credentials are `apiuser` / `password` and they can be changed by specifying
+new ones to settings.xml or supply them from command line, same way as the FourSquare API credentials.
+Credential parameters are `api.user.name` and `api.user.pwd`.
 
 ### Architecture
 
 Venue API follows Microservices architecture paradigm by splitting API functionalities into two different service deployments,
 where decoupling is based on the data entities.
 
-__Search Venues service__ provides search operations to FourSquare venue data.
-__Favorite Venues service__ allows to store, update and delete favorite FourSquare venues with keywords to a file based storage.
+- __Search Venues service__ provides search operations to FourSquare venue data.
+- __Favorite Venues service__ allows to store, update and delete favorite FourSquare venues with keywords to a file based storage.
 
 Each Venue API services builds to a separate .war archive and can be deployed independently.
 
