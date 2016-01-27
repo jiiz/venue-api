@@ -5,12 +5,12 @@
     <parent>
         <groupId>net.laivuri.venueapi</groupId>
         <artifactId>venue-api</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <groupId>net.laivuri.venueapi.service</groupId>
     <artifactId>common</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Service Common</name>
