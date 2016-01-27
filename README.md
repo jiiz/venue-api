@@ -6,15 +6,16 @@ retrieving FourSquare venues and storing them as favorites.
 - Provides a list of FourSquare venues by given location name or coordinates, optionally filtered by venue name based search string.
 - Retrieves a list of photos for specified venue.
 - Aggregates a statistics summary for given venue.
-- Allows user to save selected venues as favorites and add keywords to them.
-- Allows user to retrieve and modify the favorite venues.
+- Allows user to save favorite venues with keywords.
+- Allows user to modify favorite venue keywords
+- Allows user to retrieve and delete the favorite venues.
 
 ### Requirements
 
 Following software is required to run Venue API:
 
-- JDK 7 or newer (Tested with jdk1.8.0_45)
-- Maven 3.x (Tested with 3.2.1)
+- JDK 7 or newer (tested with jdk1.8.0_45)
+- Maven 3.x (tested with 3.2.1)
 
 In addition port __8080__ on localhost should not be reserved.
 
@@ -23,7 +24,8 @@ In addition port __8080__ on localhost should not be reserved.
 Clone the project in the folder of your choosing.
 
 Configure FourSquare API credentials by adding the maven profile below to
-your maven user specific settings.xml file (`/Users/[user]/.m2/settings.xml` on Windows). You can also can supply the credentials on command line, see details below.
+your maven user specific settings.xml file (`/Users/[user]/.m2/settings.xml` on Windows). You can also can supply the credentials
+from command line, see details below.
 ```xml
 <profile>
     <id>venue-api</id>
@@ -39,41 +41,54 @@ your maven user specific settings.xml file (`/Users/[user]/.m2/settings.xml` on 
 
 Issue either one of the following commands in the project folder:
 
-- If you setup the credentials to maven settings.xml
+_Credentials in settings.xml_
 ```
 mvn clean install && tomcat7:run
 ```
 
-- If you'd like to input them from command line
+_Credentials from command line_
 ```
 mvn clean install -Dfoursquare.client_id=[ID] -Dfoursquare.client_secret=[SECRET] && tomcat7:run
 ```
 
 This will first install the project to your local maven repository and then deploy the built service WARs to a Tomcat 7 container.
 
-Resources can be accessed on localhost at following URLs:
+### Usage
 
-- Venues: `http://localhost:8080/venues?locName=[locName]&locCoords=[coordinates]&query=[query]`
-- Venue photos: `http://localhost:8080/venues/[venueId]/photos`
-- Venue summary: `http://localhost:8080/venues/[venueId]/summary`
+After the services are successfully started the resources can be accessed on `http://localhost:8080` as specified in the table below.
 
-- Favorite venues: `http://localhost:8080/favorites`
-- Favorite venue: `http://localhost:8080/favorites/[venueId]`
+| Resource                | Path                                                              | Methods           |
+|-------------------------|-------------------------------------------------------------------|-------------------|
+| Venues                  | `/venues?locName=[locName]&locCoords=[coordinates]&query=[query]` | GET               |
+| Venue photos            | `/venues/[venueId]/photos`                                        | GET               |
+| Venue summary           | `/venues/[venueId]/summary`                                       | GET               |
+| Favorite venues         | `/favorites`                                                      | GET, POST, DELETE |
+| Favorite venue          | `/favorites/[venueId]`                                            | GET, DELETE       |
+| Favorite venue keywords | `/favorites/[venueId]/keywords`                                   | PUT               |
+
+### Authentication
+
+Adding and modifying favorite venues requires HTTP Basic authentication,
+and a CSRF protection header `X-Requested-By` with arbitrary value in the request.
+Without the CSRF header HTTP 400 - Bad Request is returned.
+
+Default username and password are `apiuser` / `password`
 
 ### Architecture
 
 Venue API follows Microservices architecture paradigm by splitting API functionalities into two different service deployments,
 where decoupling is based on the data entities.
 
-- __Search Venues service__ provides search operations to FourSquare venue data.
-- __Favorite Venues service__ allows to store, update and delete favorite FourSquare venues with keywords to a file based storage.
+__Search Venues service__ provides search operations to FourSquare venue data.
+__Favorite Venues service__ allows to store, update and delete favorite FourSquare venues with keywords to a file based storage.
 
 Each Venue API services builds to a separate .war archive and can be deployed independently.
 
 ### Security & performance aspects
 
-Security is taken into account by adding Cross-Site-Request-Forgery (CSRF) protection to all state changing requests (POST, PUT, DELETE).
-State changing requests require a `X-Requested-With` header to be present in the request.
+Security is taken into account by requiring HTTP Basic Auth for state changing operations (POST, PUT, DELETE) and
+enabling Cross-Site-Request-Forgery (CSRF) protection for these operations.
+Enabled CSRF protection means that state changing requests require a `X-Requested-By` header to be present in the request.
 
 Performance is considered in the file storage implementation where the locking mechanism
 allows multiple threads to concurrently read the data if no write operations are going on.
